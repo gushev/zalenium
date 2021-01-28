@@ -264,6 +264,12 @@ public class DockerContainerClient implements ContainerClient {
         List<Image> images;
         try {
             images = dockerClient.listImages(DockerClient.ListImagesParam.byName(imageName));
+
+            // This fix is applied, because the filter by image name does not work on some docker APIs
+            images = images.stream()
+                    .filter(i -> i.repoTags().get(0).startsWith(imageName))
+                    .collect(Collectors.toList());
+
             if (images.isEmpty()) {
                 logger.error(nodeId + " A downloaded docker-selenium image was not found!");
                 return imageName;
