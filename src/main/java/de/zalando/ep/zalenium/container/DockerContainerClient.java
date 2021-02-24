@@ -266,8 +266,6 @@ public class DockerContainerClient implements ContainerClient {
             logger.debug("Desired image name: " + imageName);
             images = dockerClient.listImages(DockerClient.ListImagesParam.byName(imageName));
 
-            System.out.println("Images: " + images);
-
             // This fix is applied, because the filter by image name does not work on some docker APIs
             images = images.stream()
                     .filter(i -> i.repoTags() != null && i.repoTags().get(0).startsWith(imageName))
