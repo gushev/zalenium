@@ -263,11 +263,14 @@ public class DockerContainerClient implements ContainerClient {
     public String getLatestDownloadedImage(String imageName) {
         List<Image> images;
         try {
+            logger.debug("Desired image name: " + imageName);
             images = dockerClient.listImages(DockerClient.ListImagesParam.byName(imageName));
+
+            System.out.println("Images: " + images);
 
             // This fix is applied, because the filter by image name does not work on some docker APIs
             images = images.stream()
-                    .filter(i -> i.repoTags().get(0).startsWith(imageName))
+                    .filter(i -> i.repoTags() != null && i.repoTags().get(0).startsWith(imageName))
                     .collect(Collectors.toList());
 
             if (images.isEmpty()) {
@@ -285,6 +288,7 @@ public class DockerContainerClient implements ContainerClient {
             logger.warn(nodeId + " Error while executing the command", e);
             ga.trackException(e);
         }
+        logger.debug("Image name: " + imageName);
         return imageName;
     }
 
